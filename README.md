@@ -1,5 +1,7 @@
 # demarchage-consent
 
+[![PyPI](https://img.shields.io/pypi/v/demarchage-consent)](https://pypi.org/project/demarchage-consent/) [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue)](https://github.com/kanibal-studio/demarchage-consent/blob/main/LICENSE)
+
 **FR — Validité du consentement au démarchage téléphonique (France).**
 Une fonction pure, sans dépendance, qui prend la date de recueil d'un
 consentement et rend `valide`, `expire`, `revoque` ou `preuve_manquante`,
@@ -38,7 +40,7 @@ can only be tightened, and a readable revocation always wins.
 ## Installation
 
 ```bash
-pip install demarchage-consent        # (publication PyPI à venir)
+pip install demarchage-consent        
 ```
 
 Ou copiez `demarchage_consent/core.py` (~100 lignes, stdlib seule).

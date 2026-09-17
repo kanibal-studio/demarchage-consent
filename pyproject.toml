@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "demarchage-consent"
-version = "0.1.0"
+version = "0.1.1"
 description = "Validité du consentement au démarchage téléphonique en France (décret 2026-662) — fonction pure, fail-closed, zéro dépendance."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -27,3 +27,7 @@ classifiers = [
 
 [tool.setuptools]
 packages = ["demarchage_consent"]
+
+[project.urls]
+Homepage = "https://github.com/kanibal-studio/demarchage-consent"
+Issues = "https://github.com/kanibal-studio/demarchage-consent/issues"
