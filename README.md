@@ -81,6 +81,12 @@ injectable pour les tests et les replays.
 EN: *Not legal advice — an age-rule in code; the caller owns overall
 compliance. Handles dates only, never personal data.*
 
+## Maintenu par
+
+[Altavista360](https://altavista360.com) — centre d'appels multilingue et plateformes de conseil en ligne pour l'Europe et le Canada. Cette bibliothèque est extraite de notre garde de consentement en production. Nos autres outils : [kanibal-studio](https://github.com/kanibal-studio).
+
+EN: Maintained by [Altavista360](https://altavista360.com), a multilingual call-center and online-advice company (Europe & Canada) — extracted from our production consent gate.
+
 ## Licence
 
 MIT — voir `LICENSE`.
