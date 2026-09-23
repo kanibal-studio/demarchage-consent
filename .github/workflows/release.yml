@@ -5,20 +5,36 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: read
+
 jobs:
+  ci:
+    # Rien n'est publié si les tests, le lint, le typage ou le build échouent.
+    uses: ./.github/workflows/ci.yml
+
   publish:
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       id-token: write  # Trusted Publishing (OIDC) — requis, aucun token stocké
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+      - name: Le tag doit correspondre à la version du paquet
+        run: |
+          version="$(python -c 'import demarchage_consent; print(demarchage_consent.__version__)')"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} ≠ version du paquet ${version} (demarchage_consent/__init__.py)"
+            exit 1
+          fi
       - name: Build sdist + wheel
         run: |
           python -m pip install --upgrade pip build twine
           python -m build
-          twine check dist/*
+          twine check --strict dist/*
       - name: Publish to PyPI via Trusted Publishing
-        uses: pypa/gh-action-pypi-publish@v1.13.0
+        uses: pypa/gh-action-pypi-publish@v1.14.2

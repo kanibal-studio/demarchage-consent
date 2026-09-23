@@ -1,33 +1,89 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "demarchage-consent"
-version = "0.1.2"
+dynamic = ["version"]
 description = "Validité du consentement au démarchage téléphonique en France (décret 2026-662) — fonction pure, fail-closed, zéro dépendance."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "ALTA VISTA360, S.L.U." }]
-keywords = ["gdpr", "rgpd", "consent", "demarchage", "telemarketing", "decret-2026-662", "france"]
+keywords = [
+    "gdpr",
+    "rgpd",
+    "consent",
+    "demarchage",
+    "telemarketing",
+    "opt-in",
+    "decret-2026-662",
+    "loi-2025-594",
+    "france",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Legal Industry",
-    "License :: OSI Approved :: MIT License",
+    "Natural Language :: French",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Office/Business",
     "Topic :: Security",
+    "Typing :: Typed",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "hypothesis>=6.100",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+demarchage-consent = "demarchage_consent.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/kanibal-studio/demarchage-consent"
+Changelog = "https://github.com/kanibal-studio/demarchage-consent/blob/main/CHANGELOG.md"
+Issues = "https://github.com/kanibal-studio/demarchage-consent/issues"
+PyPI = "https://pypi.org/project/demarchage-consent/"
 
 [tool.setuptools]
 packages = ["demarchage_consent"]
 
-[project.urls]
-Homepage = "https://github.com/kanibal-studio/demarchage-consent"
-Issues = "https://github.com/kanibal-studio/demarchage-consent/issues"
+[tool.setuptools.dynamic]
+version = { attr = "demarchage_consent.__version__" }
+
+[tool.setuptools.package-data]
+demarchage_consent = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "C4", "DTZ", "SIM", "PIE", "RUF"]
+
+[tool.ruff.lint.pyupgrade]
+# Python 3.9 : pas de `X | None` ni de `list[int]` hors annotations.
+keep-runtime-typing = true
+
+[tool.mypy]
+# La compatibilité 3.9 est vérifiée à l'exécution par la matrice de tests.
+strict = true
+files = ["demarchage_consent", "tests"]
