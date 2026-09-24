@@ -16,6 +16,12 @@ jobs:
   publish:
     needs: ci
     runs-on: ubuntu-latest
+    # Environnement GitHub « pypi » : approbation du mainteneur requise avant toute
+    # publication, tags v* uniquement. L'éditeur de confiance PyPI est lié à ce même
+    # environnement : un job qui ne le déclare pas ne peut pas publier.
+    environment:
+      name: pypi
+      url: https://pypi.org/project/demarchage-consent/
     permissions:
       id-token: write  # Trusted Publishing (OIDC) — requis, aucun token stocké
       contents: read
