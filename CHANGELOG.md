@@ -43,6 +43,14 @@ que le tag correspond à `__version__`, puis publie par Trusted Publishing).
   (auparavant `preuve_manquante`). Les deux états interdisent l'appel ;
   `revoque` évite de re-solliciter le consentement d'une personne qui a dit
   non. Le docstring le promettait déjà, le code ne le faisait pas.
+- **Une révocation illisible vaut révocation (fail-closed).** Jusqu'en 0.1.2,
+  `revoked_at=True`, `"oui"`, `1` ou une date mal formée étaient ignorés et
+  le verdict pouvait rester `valide` : une personne qui avait dit non
+  redevenait appelable. Désormais seules les absences explicites (`None`,
+  `False`, `0`, `NaN`/`NaT`, chaîne vide, `"false"`, `"faux"`, `"non"`,
+  `"no"`, `"0"`, `"n/a"`, `"na"`, `"none"`, `"null"`, `"-"`, casse
+  ignorée) ne sont pas des révocations ; toute autre valeur rend `revoque`
+  (`revoked_at=None` dans `assess_consent`).
 - **`now` explicite et illisible lève `ValueError`** au lieu de retomber
   silencieusement sur l'horloge réelle, ce qui pouvait changer le verdict
   d'un replay. `now=None` reste l'horloge UTC courante.
@@ -73,7 +81,7 @@ que le tag correspond à `__version__`, puis publie par Trusted Publishing).
 - Extra `dev`, configuration ruff / mypy / pytest dans `pyproject.toml`,
   `.gitignore`, `SECURITY.md`, ce changelog.
 - README : ordre de décision, grammaire des dates, limites assumées
-  (365 jours vs année civile, révocation illisible ignorée), références
+  (365 jours vs année civile), références
   légales (loi et décret), procédure de publication.
 
 ## [0.1.2] — 2026-09-18

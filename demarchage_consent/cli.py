@@ -41,7 +41,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--revoked-at",
         metavar="DATE",
-        help="date de révocation (ISO 8601) ; toute date lisible rend « revoque »",
+        help=(
+            "date de révocation (ISO 8601) ; toute valeur non neutre, même illisible, "
+            "rend « revoque » (neutres : vide, false, non, 0, n/a, null)"
+        ),
     )
     parser.add_argument(
         "--now",

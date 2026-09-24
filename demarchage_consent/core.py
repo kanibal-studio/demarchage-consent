@@ -140,6 +140,35 @@ def _parse_utc(value: DateInput) -> Optional[datetime]:
         return None
 
 
+# Marqueurs d'ABSENCE de révocation, tels que les exports CSV, les bases et
+# pandas les écrivent. Comparés après ``strip().lower()``.
+_NO_REVOCATION_TOKENS: Final = frozenset(
+    {"", "false", "faux", "non", "no", "0", "n/a", "na", "none", "null", "nan", "nat", "-"}
+)
+
+
+def _revocation_signaled(value: object) -> bool:
+    """Une révocation est-elle signalée, même sans date lisible ?
+
+    Fail-closed : seules les absences explicites (``None``, ``False``, ``0``,
+    ``NaN``/``NaT``, chaîne vide ou marqueur de :data:`_NO_REVOCATION_TOKENS`)
+    valent « pas de révocation ». Toute autre valeur — ``True``, ``"oui"``, une
+    date mal formée, un type inattendu — signale une révocation : une personne
+    qui a dit non ne doit jamais redevenir appelable parce que la date de son
+    refus est illisible.
+    """
+    if value is None or value is False:
+        return False
+    if isinstance(value, str):
+        return value.strip().lower() not in _NO_REVOCATION_TOKENS
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return not (value == 0 or value != value)  # 0 et NaN : absence
+    if isinstance(value, (datetime, date)):
+        # pandas.NaT est une sous-classe de datetime : absence, pas révocation.
+        return _parse_utc(value) is not None or str(value) != "NaT"
+    return True
+
+
 def _ceiling(max_age_days: Optional[int]) -> int:
     """Plafond légal : resserrable par l'appelant, JAMAIS élargissable.
 
@@ -190,7 +219,8 @@ class ConsentAssessment:
     - ``status`` : l'un des quatre états (voir :data:`STATUSES`) ;
     - ``evaluated_at`` : l'instant de référence (``now``) ;
     - ``collected_at`` / ``revoked_at`` : les dates telles que lues, ``None`` si
-      absentes ou illisibles ;
+      absentes ou illisibles (une révocation illisible rend quand même
+      ``revoque`` avec ``revoked_at=None``) ;
     - ``max_age_days`` : le plafond effectivement appliqué (≤ 365) ;
     - ``expires_at`` : dernier instant de validité (recueil + plafond), ``None``
       sans date de recueil lisible ;
@@ -245,7 +275,10 @@ def assess_consent(
 
     Ordre de décision (le premier critère vérifié l'emporte) :
 
-    1. ``revoque`` : une révocation datée lisible existe — elle prime tout, y
+    1. ``revoque`` : une révocation est signalée — datée lisible, ou présente
+       mais illisible (``True``, ``"oui"``, date mal formée…) ; seules les
+       absences explicites (``None``, ``False``, ``0``, ``""``, ``"false"``,
+       ``"non"``, ``"n/a"``, ``NaN``/``NaT``…) n'en sont pas. Elle prime tout, y
        compris une preuve de recueil absente : la personne a dit non, on ne
        re-sollicite pas son consentement ;
     2. ``preuve_manquante`` : date de recueil absente, illisible ou postérieure à
@@ -266,7 +299,7 @@ def assess_consent(
     retention = None if collected is None else _shift(collected, DECREE_PROOF_RETENTION_DAYS)
 
     status: ConsentStatus
-    if revoked is not None:
+    if revoked is not None or _revocation_signaled(revoked_at):
         status = REVOQUE
     elif collected is None or collected > current:
         status = PREUVE_MANQUANTE
@@ -302,7 +335,9 @@ def evaluate_consent(
 
     - ``valide`` : preuve datée lisible, non révoquée, âge ≤ plafond ;
     - ``expire`` : preuve datée lisible mais plus ancienne que le plafond ;
-    - ``revoque`` : une révocation datée lisible existe (elle prime tout) ;
+    - ``revoque`` : une révocation est signalée, lisible ou non (elle prime
+      tout ; seules les absences explicites n'en sont pas, voir
+      :func:`assess_consent`) ;
     - ``preuve_manquante`` : date absente, illisible ou dans le futur — ce n'est
       pas une preuve recevable. Fail-closed, sans repli.
 

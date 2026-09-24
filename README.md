@@ -124,7 +124,7 @@ Ordre de décision (le premier critère vérifié l'emporte) :
 
 | # | Condition | État |
 |---|-----------|------|
-| 1 | `revoked_at` est une date lisible (même future ou antérieure au recueil) | `revoque` |
+| 1 | `revoked_at` signale une révocation : date lisible (même future ou antérieure au recueil) **ou valeur illisible** (`True`, `"oui"`, date mal formée…) | `revoque` |
 | 2 | `collected_at` absent, illisible, d'un type inattendu ou **postérieur à `now`** | `preuve_manquante` |
 | 3 | `now − collected_at` > plafond (365 jours, ou moins si `max_age_days` resserre) | `expire` |
 | 4 | sinon (le jour anniversaire, à la microseconde près, est encore valide) | `valide` |
@@ -135,9 +135,13 @@ Ordre de décision (le premier critère vérifié l'emporte) :
   changer le verdict d'un replay.
 - `max_age_days` : `None`, `0`, négatif ou illisible = plafond du
   décret ; toute valeur > 365 est ramenée à 365.
-- `revoked_at` illisible (`"n/a"`, `""`, `"false"`…) est **ignoré** — ce
-  n'est pas une date de révocation. Si votre système stocke la révocation
-  sous forme de booléen, convertissez-la en date avant l'appel.
+- `revoked_at` est lu **fail-closed** : seules les absences explicites —
+  `None`, `False`, `0`, `NaN`/`NaT`, chaîne vide ou `"false"`, `"faux"`,
+  `"non"`, `"no"`, `"0"`, `"n/a"`, `"na"`, `"none"`, `"null"`, `"-"`
+  (casse ignorée) — valent « pas de révocation ». Toute autre valeur
+  (`True`, `"oui"`, `1`, une date mal formée…) rend `revoque`, avec
+  `revoked_at=None` dans `assess_consent` : une personne qui a dit non ne
+  redevient jamais appelable parce que la date de son refus est illisible.
 - Aucune entrée (`collected_at`, `revoked_at`, `max_age_days`) ne fait
   lever d'exception, quel que soit son type ou sa valeur — vérifié par
   des tests de propriétés (Hypothesis).
