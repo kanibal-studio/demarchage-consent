@@ -77,7 +77,9 @@ que le tag correspond à `__version__`, puis publie par Trusted Publishing).
   Python 3.9 → 3.14.
 - CI GitHub Actions : tests sur la matrice 3.9 → 3.14, ruff (lint + format),
   mypy, build + `twine check --strict` ; release conditionnée à la CI et au
-  contrôle tag = version ; Dependabot (actions et dépendances de dev).
+  contrôle tag = version ; actions épinglées par SHA (le workflow de
+  publication détient le jeton OIDC PyPI) ; Dependabot (actions et
+  dépendances de dev).
 - Extra `dev`, configuration ruff / mypy / pytest dans `pyproject.toml`,
   `.gitignore`, `SECURITY.md`, ce changelog.
 - README : ordre de décision, grammaire des dates, limites assumées
