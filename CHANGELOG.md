@@ -4,6 +4,14 @@ Toutes les évolutions notables de ce projet sont consignées ici.
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ;
 numérotation : [SemVer](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+### Sécurité
+
+- Publication PyPI soumise à l'approbation du mainteneur : le job de
+  publication passe par l'environnement GitHub `pypi` (tags `v*` uniquement,
+  relecteur requis), auquel l'éditeur de confiance PyPI est lié.
+
 ## [0.2.0] — 2026-09-25
 
 Publication PyPI : pousser le tag `v0.2.0` (le workflow rejoue la CI, vérifie
