@@ -4,7 +4,7 @@ Toutes les évolutions notables de ce projet sont consignées ici.
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ;
 numérotation : [SemVer](https://semver.org/lang/fr/).
 
-## [0.2.0] — 2026-09-23
+## [0.2.0] — 2026-09-25
 
 Publication PyPI : pousser le tag `v0.2.0` (le workflow rejoue la CI, vérifie
 que le tag correspond à `__version__`, puis publie par Trusted Publishing).
